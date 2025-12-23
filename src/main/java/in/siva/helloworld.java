@@ -9,6 +9,6 @@ public class helloworld {
 	@GetMapping("/")
 	public String index()
 	{
-		return "<h1> HI ....Hello welcome to Devops Practice</h1>";
+		return "HI ....Hello welcome to Devops Practice";
 	}
 }
