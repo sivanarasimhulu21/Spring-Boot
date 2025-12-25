@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_PORT = '9091'
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/sivanarasimhulu21/Spring-Boot.git'
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Stop Old Application') {
+            steps {
+                sh '''
+                PID=$(lsof -t -i:${APP_PORT}) || true
+                if [ ! -z "$PID" ]; then
+                  kill -9 $PID
+                fi
+                '''
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                sh '''
+                nohup java -jar target/*.jar > app.log 2>&1 &
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Application deployed successfully on port 9091"
+        }
+        failure {
+            echo "Deployment failed"
+        }
+    }
+}
